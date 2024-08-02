@@ -6,9 +6,7 @@ export const Authors = ({ show }) => {
   const [name, setName] = useState("");
   const [born, setBorn] = useState("");
 
-  const result = useQuery(ALL_AUTHORS, {
-    skip: !show,
-  });
+  const result = useQuery(ALL_AUTHORS);
 
   const [updateAuthor] = useMutation(UPDATE_AUTHOR);
 
