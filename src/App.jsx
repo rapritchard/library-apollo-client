@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useApolloClient, useQuery } from "@apollo/client";
+import { useApolloClient, useQuery, useSubscription } from "@apollo/client";
 import { Authors } from "./components/Authors";
 import { Books } from "./components/Books";
 import { NewBook } from "./components/NewBook";
 import { LoginForm } from "./components/LoginForm";
 import { Recommendations } from "./components/Recommendations";
-import { GET_USER } from "./queries";
+import { ALL_BOOKS, BOOK_ADDED, GET_USER } from "./queries";
+import { updateCache } from "./utils";
 
 export const App = () => {
   const client = useApolloClient();
@@ -13,6 +14,18 @@ export const App = () => {
   const [page, setPage] = useState("authors");
   const userResult = useQuery(GET_USER, {
     skip: !token,
+  });
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data }) => {
+      const addedBook = data.data.bookAdded;
+      alert(`${addedBook.title} added`);
+      updateCache(
+        client.cache,
+        { query: ALL_BOOKS, variables: { genre: "" } },
+        addedBook
+      );
+    },
   });
 
   const logout = () => {
